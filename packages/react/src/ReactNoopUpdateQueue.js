@@ -35,6 +35,7 @@ function warnNoop(publicInstance, callerName) {
 /**
  * This is the abstract API for an update queue.
  */
+// 会在react-dom里面被替换
 const ReactNoopUpdateQueue = {
   /**
    * Checks whether or not this composite component is mounted.

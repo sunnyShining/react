@@ -16,7 +16,7 @@ import warning from 'shared/warning';
 
 export function createContext<T>(
   defaultValue: T,
-  calculateChangedBits: ?(a: T, b: T) => number,
+  calculateChangedBits: ?(a: T, b: T) => number, // todo
 ): ReactContext<T> {
   if (calculateChangedBits === undefined) {
     calculateChangedBits = null;
@@ -31,7 +31,7 @@ export function createContext<T>(
       );
     }
   }
-
+  // context
   const context: ReactContext<T> = {
     $$typeof: REACT_CONTEXT_TYPE,
     _calculateChangedBits: calculateChangedBits,
@@ -52,7 +52,7 @@ export function createContext<T>(
 
   context.Provider = {
     $$typeof: REACT_PROVIDER_TYPE,
-    _context: context,
+    _context: context, // _context即为context对象
   };
 
   let hasWarnedAboutUsingNestedContextConsumers = false;
@@ -126,7 +126,7 @@ export function createContext<T>(
     // $FlowFixMe: Flow complains about missing properties because it doesn't understand defineProperty
     context.Consumer = Consumer;
   } else {
-    context.Consumer = context;
+    context.Consumer = context; // Consumer就是整个context
   }
 
   if (__DEV__) {

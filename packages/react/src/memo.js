@@ -24,6 +24,7 @@ export default function memo<Props>(
       );
     }
   }
+  // 同样仅仅返回了一个对象
   return {
     $$typeof: REACT_MEMO_TYPE,
     type,

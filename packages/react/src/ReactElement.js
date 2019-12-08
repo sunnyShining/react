@@ -22,6 +22,7 @@ const RESERVED_PROPS = {
 
 let specialPropKeyWarningShown, specialPropRefWarningShown;
 
+// 是否有ref
 function hasValidRef(config) {
   if (__DEV__) {
     if (hasOwnProperty.call(config, 'ref')) {
@@ -34,6 +35,7 @@ function hasValidRef(config) {
   return config.ref !== undefined;
 }
 
+// 是否有key
 function hasValidKey(config) {
   if (__DEV__) {
     if (hasOwnProperty.call(config, 'key')) {
@@ -113,6 +115,7 @@ function defineRefPropWarningGetter(props, displayName) {
  * @internal
  */
 const ReactElement = function(type, key, ref, self, source, owner, props) {
+  // 真正的reactElement
   const element = {
     // This tag allows us to uniquely identify this as a React Element
     $$typeof: REACT_ELEMENT_TYPE,
@@ -338,7 +341,7 @@ export function createElement(type, config, children) {
     for (propName in config) {
       if (
         hasOwnProperty.call(config, propName) &&
-        !RESERVED_PROPS.hasOwnProperty(propName)
+        !RESERVED_PROPS.hasOwnProperty(propName) // 排除config key ref __self __source
       ) {
         props[propName] = config[propName];
       }
@@ -350,7 +353,7 @@ export function createElement(type, config, children) {
   const childrenLength = arguments.length - 2;
   if (childrenLength === 1) {
     props.children = children;
-  } else if (childrenLength > 1) {
+  } else if (childrenLength > 1) { // children
     const childArray = Array(childrenLength);
     for (let i = 0; i < childrenLength; i++) {
       childArray[i] = arguments[i + 2];
@@ -367,7 +370,7 @@ export function createElement(type, config, children) {
   if (type && type.defaultProps) {
     const defaultProps = type.defaultProps;
     for (propName in defaultProps) {
-      if (props[propName] === undefined) {
+      if (props[propName] === undefined) { // 在props里面没有值的时候才用defaultProps进行覆盖
         props[propName] = defaultProps[propName];
       }
     }
@@ -392,7 +395,7 @@ export function createElement(type, config, children) {
     ref,
     self,
     source,
-    ReactCurrentOwner.current,
+    ReactCurrentOwner.current, // beginWork用到
     props,
   );
 }
@@ -401,6 +404,7 @@ export function createElement(type, config, children) {
  * Return a function that produces ReactElements of a given type.
  * See https://reactjs.org/docs/react-api.html#createfactory
  */
+// 可以建一个工厂函数
 export function createFactory(type) {
   const factory = createElement.bind(null, type);
   // Expose the type on the factory and the prototype so that it can be
@@ -412,6 +416,7 @@ export function createFactory(type) {
   return factory;
 }
 
+// clone 一个reactElement更换key
 export function cloneAndReplaceKey(oldElement, newKey) {
   const newElement = ReactElement(
     oldElement.type,
@@ -440,7 +445,7 @@ export function cloneElement(element, config, children) {
   let propName;
 
   // Original props are copied
-  const props = Object.assign({}, element.props);
+  const props = Object.assign({}, element.props); // copy old child props
 
   // Reserved names are extracted
   let key = element.key;
@@ -470,7 +475,7 @@ export function cloneElement(element, config, children) {
     if (element.type && element.type.defaultProps) {
       defaultProps = element.type.defaultProps;
     }
-    for (propName in config) {
+    for (propName in config) { // 在props上新增一些值
       if (
         hasOwnProperty.call(config, propName) &&
         !RESERVED_PROPS.hasOwnProperty(propName)
@@ -508,6 +513,7 @@ export function cloneElement(element, config, children) {
  * @return {boolean} True if `object` is a ReactElement.
  * @final
  */
+// 校验是不是一个合法的ReactElement
 export function isValidElement(object) {
   return (
     typeof object === 'object' &&

@@ -11,6 +11,7 @@ import {REACT_LAZY_TYPE} from 'shared/ReactSymbols';
 import warning from 'shared/warning';
 
 export function lazy<T, R>(ctor: () => Thenable<T, R>): LazyComponent<T> {
+  // add lazy object
   let lazyType = {
     $$typeof: REACT_LAZY_TYPE,
     _ctor: ctor,

@@ -300,7 +300,7 @@ function updateForwardRef(
     }
   }
 
-  const render = Component.render;
+  const render = Component.render; // 找到render方法即为传入的第一个参数
   const ref = workInProgress.ref;
 
   // The rest is a fork of updateFunctionComponent

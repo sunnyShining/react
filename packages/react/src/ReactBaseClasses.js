@@ -18,16 +18,17 @@ if (__DEV__) {
 /**
  * Base class helpers for the updating state of a component.
  */
-function Component(props, context, updater) {
+function Component(props, context, updater) { // super
   this.props = props;
   this.context = context;
   // If a component has string refs, we will assign a different object later.
   this.refs = emptyObject;
   // We initialize the default updater but the real one gets injected by the
   // renderer.
+  // 整个function component更新核心
   this.updater = updater || ReactNoopUpdateQueue;
 }
-
+// 标明是react组件
 Component.prototype.isReactComponent = {};
 
 /**
@@ -140,6 +141,6 @@ const pureComponentPrototype = (PureComponent.prototype = new ComponentDummy());
 pureComponentPrototype.constructor = PureComponent;
 // Avoid an extra prototype jump for these methods.
 Object.assign(pureComponentPrototype, Component.prototype);
-pureComponentPrototype.isPureReactComponent = true;
+pureComponentPrototype.isPureReactComponent = true; // 继承自Component，添加一个isPureReactComponent属性标明是PureComponent
 
 export {Component, PureComponent};

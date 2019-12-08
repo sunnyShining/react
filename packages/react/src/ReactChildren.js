@@ -52,6 +52,7 @@ function escapeUserProvidedKey(text) {
 
 const POOL_SIZE = 10;
 const traverseContextPool = [];
+// 保留对象，避免创建数组对象带来性能消耗
 function getPooledTraverseContext(
   mapResult,
   keyPrefix,
@@ -96,6 +97,7 @@ function releaseTraverseContext(traverseContext) {
  * process.
  * @return {!number} The number of children in this subtree.
  */
+// children, '', mapSingleChildIntoContext, traverseContext
 function traverseAllChildrenImpl(
   children,
   nameSoFar,
@@ -144,7 +146,7 @@ function traverseAllChildrenImpl(
   let subtreeCount = 0; // Count of children found in the current subtree.
   const nextNamePrefix =
     nameSoFar === '' ? SEPARATOR : nameSoFar + SUBSEPARATOR;
-
+// 如果是数组呢，进行下一次循环
   if (Array.isArray(children)) {
     for (let i = 0; i < children.length; i++) {
       child = children[i];
@@ -157,6 +159,7 @@ function traverseAllChildrenImpl(
       );
     }
   } else {
+    // 迭代的
     const iteratorFn = getIteratorFn(children);
     if (typeof iteratorFn === 'function') {
       if (__DEV__) {
@@ -185,7 +188,7 @@ function traverseAllChildrenImpl(
           traverseContext,
         );
       }
-    } else if (type === 'object') {
+    } else if (type === 'object') { // 如果还是一个对象则抛出警告
       let addendum = '';
       if (__DEV__) {
         addendum =
@@ -224,11 +227,12 @@ function traverseAllChildrenImpl(
  * @param {?*} traverseContext Context for traversal.
  * @return {!number} The number of children in this subtree.
  */
+// children, mapSingleChildIntoContext, traverseContext
 function traverseAllChildren(children, callback, traverseContext) {
   if (children == null) {
     return 0;
   }
-
+  // children, '', mapSingleChildIntoContext, traverseContext
   return traverseAllChildrenImpl(children, '', callback, traverseContext);
 }
 
@@ -254,6 +258,7 @@ function getComponentKey(component, index) {
   return index.toString(36);
 }
 
+// 不再需要塞入result里面去了
 function forEachSingleChild(bookKeeping, child, name) {
   const {func, context} = bookKeeping;
   func.call(context, child, bookKeeping.count++);
@@ -285,15 +290,16 @@ function forEachChildren(children, forEachFunc, forEachContext) {
   releaseTraverseContext(traverseContext);
 }
 
+//  traverseContext, children, nameSoFar
 function mapSingleChildIntoContext(bookKeeping, child, childKey) {
   const {result, keyPrefix, func, context} = bookKeeping;
 
-  let mappedChild = func.call(context, child, bookKeeping.count++);
-  if (Array.isArray(mappedChild)) {
+  let mappedChild = func.call(context, child, bookKeeping.count++); // child index
+  if (Array.isArray(mappedChild)) { // 如果返回的是array，重新递归一次
     mapIntoWithKeyPrefixInternal(mappedChild, result, childKey, c => c);
   } else if (mappedChild != null) {
     if (isValidElement(mappedChild)) {
-      mappedChild = cloneAndReplaceKey(
+      mappedChild = cloneAndReplaceKey( // react element替换element并且replace key的方法
         mappedChild,
         // Keep both the (mapped) and old keys if they differ, just as
         // traverseAllChildren used to do for objects as children
@@ -301,13 +307,14 @@ function mapSingleChildIntoContext(bookKeeping, child, childKey) {
           (mappedChild.key && (!child || child.key !== mappedChild.key)
             ? escapeUserProvidedKey(mappedChild.key) + '/'
             : '') +
-          childKey,
+          childKey, // child key
       );
     }
     result.push(mappedChild);
   }
 }
 
+// 1、children result null func context
 function mapIntoWithKeyPrefixInternal(children, array, prefix, func, context) {
   let escapedPrefix = '';
   if (prefix != null) {
@@ -336,6 +343,7 @@ function mapIntoWithKeyPrefixInternal(children, array, prefix, func, context) {
  * @param {*} context Context for mapFunction.
  * @return {object} Object containing the ordered map of results.
  */
+// context 是this上下文
 function mapChildren(children, func, context) {
   if (children == null) {
     return children;
@@ -384,6 +392,7 @@ function toArray(children) {
  * @return {ReactElement} The first and only `ReactElement` contained in the
  * structure.
  */
+// 单独一个child
 function onlyChild(children) {
   invariant(
     isValidElement(children),

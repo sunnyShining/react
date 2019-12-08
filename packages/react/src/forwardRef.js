@@ -45,7 +45,7 @@ export default function forwardRef<Props, ElementType: React$ElementType>(
       );
     }
   }
-
+  // 仅仅返回了一个对象
   return {
     $$typeof: REACT_FORWARD_REF_TYPE,
     render,

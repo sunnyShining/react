@@ -19,6 +19,7 @@ import {REACT_RESPONDER_TYPE} from 'shared/ReactSymbols';
 import ReactCurrentDispatcher from './ReactCurrentDispatcher';
 
 function resolveDispatcher() {
+  // beginWork里面会进行赋值
   const dispatcher = ReactCurrentDispatcher.current;
   invariant(
     dispatcher !== null,
