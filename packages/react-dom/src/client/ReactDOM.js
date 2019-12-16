@@ -133,9 +133,9 @@ const ReactDOM: Object = {
   createPortal,
 
   // Legacy
-  findDOMNode,
+  findDOMNode, // 即将废弃
   hydrate,
-  render,
+  render, // 每个react应用入口处
   unstable_renderSubtreeIntoContainer,
   unmountComponentAtNode,
 
@@ -156,7 +156,7 @@ const ReactDOM: Object = {
     }
     return createPortal(...args);
   },
-
+  // 批量更新
   unstable_batchedUpdates: batchedUpdates,
 
   flushSync: flushSync,

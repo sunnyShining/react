@@ -7,9 +7,15 @@
  * @flow
  */
 
-import type {DOMContainer} from './ReactDOM';
-import type {RootType} from './ReactDOMRoot';
-import type {ReactNodeList} from 'shared/ReactTypes';
+import type {
+  DOMContainer
+} from './ReactDOM';
+import type {
+  RootType
+} from './ReactDOMRoot';
+import type {
+  ReactNodeList
+} from 'shared/ReactTypes';
 
 import {
   getInstanceFromNode,
@@ -21,7 +27,9 @@ import {
   isValidContainer,
   warnOnInvalidCallback,
 } from './ReactDOMRoot';
-import {ROOT_ATTRIBUTE_NAME} from '../shared/DOMProperty';
+import {
+  ROOT_ATTRIBUTE_NAME
+} from '../shared/DOMProperty';
 import {
   DOCUMENT_NODE,
   ELEMENT_NODE,
@@ -41,7 +49,9 @@ import invariant from 'shared/invariant';
 import lowPriorityWarningWithoutStack from 'shared/lowPriorityWarningWithoutStack';
 import warningWithoutStack from 'shared/warningWithoutStack';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
-import {has as hasInstance} from 'shared/ReactInstanceMap';
+import {
+  has as hasInstance
+} from 'shared/ReactInstanceMap';
 
 const ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 
@@ -50,7 +60,8 @@ let warnedAboutHydrateAPI = false;
 
 if (__DEV__) {
   topLevelUpdateWarnings = (container: DOMContainer) => {
-    if (container._reactRootContainer && container.nodeType !== COMMENT_NODE) {
+    if (container._reactRootContainer && container.nodeType !==
+      COMMENT_NODE) {
       const hostInstance = findHostInstanceWithNoPortals(
         container._reactRootContainer._internalRoot.current,
       );
@@ -58,9 +69,9 @@ if (__DEV__) {
         warningWithoutStack(
           hostInstance.parentNode === container,
           'render(...): It looks like the React-rendered content of this ' +
-            'container was removed without using React. This is not ' +
-            'supported and will cause errors. Instead, call ' +
-            'ReactDOM.unmountComponentAtNode to empty a container.',
+          'container was removed without using React. This is not ' +
+          'supported and will cause errors. Instead, call ' +
+          'ReactDOM.unmountComponentAtNode to empty a container.',
         );
       }
     }
@@ -72,20 +83,20 @@ if (__DEV__) {
     warningWithoutStack(
       !hasNonRootReactChild || isRootRenderedBySomeReact,
       'render(...): Replacing React-rendered children with a new root ' +
-        'component. If you intended to update the children of this node, ' +
-        'you should instead have the existing children update their state ' +
-        'and render the new components instead of calling ReactDOM.render.',
+      'component. If you intended to update the children of this node, ' +
+      'you should instead have the existing children update their state ' +
+      'and render the new components instead of calling ReactDOM.render.',
     );
 
     warningWithoutStack(
       container.nodeType !== ELEMENT_NODE ||
-        !((container: any): Element).tagName ||
-        ((container: any): Element).tagName.toUpperCase() !== 'BODY',
+      !((container: any): Element).tagName ||
+      ((container: any): Element).tagName.toUpperCase() !== 'BODY',
       'render(): Rendering components directly into document.body is ' +
-        'discouraged, since its children are often manipulated by third-party ' +
-        'scripts and browser extensions. This may lead to subtle ' +
-        'reconciliation issues. Try rendering into a container element created ' +
-        'for your app.',
+      'discouraged, since its children are often manipulated by third-party ' +
+      'scripts and browser extensions. This may lead to subtle ' +
+      'reconciliation issues. Try rendering into a container element created ' +
+      'for your app.',
     );
   };
 }
@@ -107,7 +118,7 @@ function shouldHydrateDueToLegacyHeuristic(container) {
   return !!(
     rootElement &&
     rootElement.nodeType === ELEMENT_NODE &&
-    rootElement.hasAttribute(ROOT_ATTRIBUTE_NAME)
+    rootElement.hasAttribute(ROOT_ATTRIBUTE_NAME) // react在dom上保留的属性
   );
 }
 
@@ -121,7 +132,7 @@ function legacyCreateRootFromDOMContainer(
   if (!shouldHydrate) {
     let warned = false;
     let rootSibling;
-    while ((rootSibling = container.lastChild)) {
+    while ((rootSibling = container.lastChild)) { // 把已存在的dom移空
       if (__DEV__) {
         if (
           !warned &&
@@ -132,8 +143,8 @@ function legacyCreateRootFromDOMContainer(
           warningWithoutStack(
             false,
             'render(): Target node has markup rendered by React, but there ' +
-              'are unrelated nodes as well. This is most commonly caused by ' +
-              'white-space inserted around server-rendered markup.',
+            'are unrelated nodes as well. This is most commonly caused by ' +
+            'white-space inserted around server-rendered markup.',
           );
         }
       }
@@ -146,28 +157,29 @@ function legacyCreateRootFromDOMContainer(
       lowPriorityWarningWithoutStack(
         false,
         'render(): Calling ReactDOM.render() to hydrate server-rendered markup ' +
-          'will stop working in React v17. Replace the ReactDOM.render() call ' +
-          'with ReactDOM.hydrate() if you want React to attach to the server HTML.',
+        'will stop working in React v17. Replace the ReactDOM.render() call ' +
+        'with ReactDOM.hydrate() if you want React to attach to the server HTML.',
       );
     }
   }
 
-  return createLegacyRoot(
+  return createLegacyRoot( // 创建fiberRoot
     container,
-    shouldHydrate
-      ? {
-          hydrate: true,
-        }
-      : undefined,
+    shouldHydrate ?
+    {
+      hydrate: true,
+    } :
+    undefined,
   );
 }
 
+// null <App /> #app false callback
 function legacyRenderSubtreeIntoContainer(
-  parentComponent: ?React$Component<any, any>,
-  children: ReactNodeList,
+  parentComponent: ? React$Component < any, any > ,
+  children : ReactNodeList,
   container: DOMContainer,
   forceHydrate: boolean,
-  callback: ?Function,
+  callback: ? Function,
 ) {
   if (__DEV__) {
     topLevelUpdateWarnings(container);
@@ -176,7 +188,7 @@ function legacyRenderSubtreeIntoContainer(
 
   // TODO: Without `any` type, Flow says "Property cannot be accessed on any
   // member of intersection type." Whyyyyyy.
-  let root: RootType = (container._reactRootContainer: any);
+  let root: RootType = (container._reactRootContainer: any); // 初始化时 root肯定不存在
   let fiberRoot;
   if (!root) {
     // Initial mount
@@ -187,7 +199,7 @@ function legacyRenderSubtreeIntoContainer(
     fiberRoot = root._internalRoot;
     if (typeof callback === 'function') {
       const originalCallback = callback;
-      callback = function() {
+      callback = function () {
         const instance = getPublicRootInstance(fiberRoot);
         originalCallback.call(instance);
       };
@@ -197,10 +209,10 @@ function legacyRenderSubtreeIntoContainer(
       updateContainer(children, fiberRoot, parentComponent, callback);
     });
   } else {
-    fiberRoot = root._internalRoot;
+    fiberRoot = root._internalRoot; // 直接取的fiberRoot
     if (typeof callback === 'function') {
       const originalCallback = callback;
-      callback = function() {
+      callback = function () {
         const instance = getPublicRootInstance(fiberRoot);
         originalCallback.call(instance);
       };
@@ -212,19 +224,20 @@ function legacyRenderSubtreeIntoContainer(
 }
 
 export function findDOMNode(
-  componentOrElement: Element | ?React$Component<any, any>,
+  componentOrElement: Element | ? React$Component < any, any > ,
 ): null | Element | Text {
   if (__DEV__) {
     let owner = (ReactCurrentOwner.current: any);
     if (owner !== null && owner.stateNode !== null) {
-      const warnedAboutRefsInRender = owner.stateNode._warnedAboutRefsInRender;
+      const warnedAboutRefsInRender = owner.stateNode
+      ._warnedAboutRefsInRender;
       warningWithoutStack(
         warnedAboutRefsInRender,
         '%s is accessing findDOMNode inside its render(). ' +
-          'render() should be a pure function of props and state. It should ' +
-          'never access something that requires stale data from the previous ' +
-          'render, such as refs. Move this logic to componentDidMount and ' +
-          'componentDidUpdate instead.',
+        'render() should be a pure function of props and state. It should ' +
+        'never access something that requires stale data from the previous ' +
+        'render, such as refs. Move this logic to componentDidMount and ' +
+        'componentDidUpdate instead.',
         getComponentName(owner.type) || 'A component',
       );
       owner.stateNode._warnedAboutRefsInRender = true;
@@ -245,7 +258,7 @@ export function findDOMNode(
 export function hydrate(
   element: React$Node,
   container: DOMContainer,
-  callback: ?Function,
+  callback: ? Function,
 ) {
   invariant(
     isValidContainer(container),
@@ -259,8 +272,8 @@ export function hydrate(
       warningWithoutStack(
         false,
         'You are calling ReactDOM.hydrate() on a container that was previously ' +
-          'passed to ReactDOM.createRoot(). This is not supported. ' +
-          'Did you mean to call createRoot(container, {hydrate: true}).render(element)?',
+        'passed to ReactDOM.createRoot(). This is not supported. ' +
+        'Did you mean to call createRoot(container, {hydrate: true}).render(element)?',
       );
     }
   }
@@ -275,10 +288,11 @@ export function hydrate(
 }
 
 export function render(
-  element: React$Element<any>,
+  element: React$Element < any > ,
   container: DOMContainer,
-  callback: ?Function,
+  callback: ? Function,
 ) {
+  // 校验是否是合法的dom
   invariant(
     isValidContainer(container),
     'Target container is not a DOM element.',
@@ -291,11 +305,12 @@ export function render(
       warningWithoutStack(
         false,
         'You are calling ReactDOM.render() on a container that was previously ' +
-          'passed to ReactDOM.createRoot(). This is not supported. ' +
-          'Did you mean to call root.render(element)?',
+        'passed to ReactDOM.createRoot(). This is not supported. ' +
+        'Did you mean to call root.render(element)?',
       );
     }
   }
+  // null <App /> #app false callback
   return legacyRenderSubtreeIntoContainer(
     null,
     element,
@@ -306,10 +321,10 @@ export function render(
 }
 
 export function unstable_renderSubtreeIntoContainer(
-  parentComponent: React$Component<any, any>,
-  element: React$Element<any>,
+  parentComponent: React$Component < any, any > ,
+  element: React$Element < any > ,
   containerNode: DOMContainer,
-  callback: ?Function,
+  callback: ? Function,
 ) {
   invariant(
     isValidContainer(containerNode),
@@ -342,7 +357,7 @@ export function unmountComponentAtNode(container: DOMContainer) {
       warningWithoutStack(
         false,
         'You are calling ReactDOM.unmountComponentAtNode() on a container that was previously ' +
-          'passed to ReactDOM.createRoot(). This is not supported. Did you mean to call root.unmount()?',
+        'passed to ReactDOM.createRoot(). This is not supported. Did you mean to call root.unmount()?',
       );
     }
   }
@@ -354,7 +369,7 @@ export function unmountComponentAtNode(container: DOMContainer) {
       warningWithoutStack(
         !renderedByDifferentReact,
         "unmountComponentAtNode(): The node you're attempting to unmount " +
-          'was rendered by another copy of React.',
+        'was rendered by another copy of React.',
       );
     }
 
@@ -382,12 +397,12 @@ export function unmountComponentAtNode(container: DOMContainer) {
       warningWithoutStack(
         !hasNonRootReactChild,
         "unmountComponentAtNode(): The node you're attempting to unmount " +
-          'was rendered by React and is not a top-level container. %s',
-        isContainerReactRoot
-          ? 'You may have accidentally passed in a React root node instead ' +
-            'of its container.'
-          : 'Instead, have the parent component update its state and ' +
-            'rerender in order to remove this component.',
+        'was rendered by React and is not a top-level container. %s',
+        isContainerReactRoot ?
+        'You may have accidentally passed in a React root node instead ' +
+        'of its container.' :
+        'Instead, have the parent component update its state and ' +
+        'rerender in order to remove this component.',
       );
     }
 
