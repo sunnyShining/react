@@ -30,14 +30,14 @@ export type PendingInteractionMap = Map<ExpirationTime, Set<Interaction>>;
 
 type BaseFiberRootProperties = {|
   // The type of root (legacy, batched, concurrent, etc.)
-  tag: RootTag,
+  tag: RootTag, // root 类型
 
   // Any additional information from the host associated with this root.
-  containerInfo: any,
+  containerInfo: any, // #app
   // Used only by persistent updates.
-  pendingChildren: any,
+  pendingChildren: any, // 仅用于持久更新
   // The currently active root fiber. This is the mutable root of the tree.
-  current: Fiber,
+  current: Fiber, // 目前活跃的root fiber。这是树的可变根。
 
   pingCache:
     | WeakMap<Thenable, Set<ExpirationTime>>
@@ -46,32 +46,32 @@ type BaseFiberRootProperties = {|
 
   finishedExpirationTime: ExpirationTime,
   // A finished work-in-progress HostRoot that's ready to be committed.
-  finishedWork: Fiber | null,
+  finishedWork: Fiber | null, // 一个完成的正在进行中的HostRoot，可以提交了。
   // Timeout handle returned by setTimeout. Used to cancel a pending timeout, if
   // it's superseded by a new one.
-  timeoutHandle: TimeoutHandle | NoTimeout,
+  timeoutHandle: TimeoutHandle | NoTimeout, // setTimeout返回的超时句柄。用于取消挂起超时(如果已被新超时取代)。
   // Top context object, used by renderSubtreeIntoContainer
-  context: Object | null,
+  context: Object | null, //Top context对象，由renderSubtreeIntoContainer使用
   pendingContext: Object | null,
   // Determines if we should attempt to hydrate on the initial mount
   +hydrate: boolean,
   // Node returned by Scheduler.scheduleCallback
-  callbackNode: *,
+  callbackNode: *, // 调度器返回的节点
   // Expiration of the callback associated with this root
-  callbackExpirationTime: ExpirationTime,
+  callbackExpirationTime: ExpirationTime, // 与此根关联的回调过期
   // Priority of the callback associated with this root
-  callbackPriority: ReactPriorityLevel,
+  callbackPriority: ReactPriorityLevel, // 与此根关联的回调的优先级
   // The earliest pending expiration time that exists in the tree
-  firstPendingTime: ExpirationTime,
+  firstPendingTime: ExpirationTime, // 树中存在的最早的挂起过期时间
   // The earliest suspended expiration time that exists in the tree
-  firstSuspendedTime: ExpirationTime,
+  firstSuspendedTime: ExpirationTime, // 树中存在的最新挂起过期时间
   // The latest suspended expiration time that exists in the tree
   lastSuspendedTime: ExpirationTime,
   // The next known expiration time after the suspended range
-  nextKnownPendingLevel: ExpirationTime,
+  nextKnownPendingLevel: ExpirationTime, // 挂起范围之后的下一个已知过期时间
   // The latest time at which a suspended component pinged the root to
   // render again
-  lastPingedTime: ExpirationTime,
+  lastPingedTime: ExpirationTime, // 被挂起的组件发出ping信号使根再次呈现的最新时间
   lastExpiredTime: ExpirationTime,
 |};
 
@@ -101,9 +101,10 @@ export type FiberRoot = {
   ...SuspenseCallbackOnlyFiberRootProperties,
 };
 
+// #app 0 false
 function FiberRootNode(containerInfo, tag, hydrate) {
-  this.tag = tag;
-  this.current = null;
+  this.tag = tag; // worktag
+  this.current = null; // current
   this.containerInfo = containerInfo;
   this.pendingChildren = null;
   this.pingCache = null;
@@ -119,7 +120,7 @@ function FiberRootNode(containerInfo, tag, hydrate) {
   this.firstSuspendedTime = NoWork;
   this.lastSuspendedTime = NoWork;
   this.nextKnownPendingLevel = NoWork;
-  this.lastPingedTime = NoWork;
+  this.lastPingedTime = NoWork; // NoWork is 0
   this.lastExpiredTime = NoWork;
 
   if (enableSchedulerTracing) {
@@ -132,6 +133,7 @@ function FiberRootNode(containerInfo, tag, hydrate) {
   }
 }
 
+// #app 0 false null
 export function createFiberRoot(
   containerInfo: any,
   tag: RootTag,

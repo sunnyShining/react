@@ -51,6 +51,7 @@ function ReactDOMRoot(container: DOMContainer, options: void | RootOptions) {
   this._internalRoot = createRootImpl(container, ConcurrentRoot, options);
 }
 
+// #app 0 undefined
 function ReactDOMBlockingRoot(
   container: DOMContainer,
   tag: RootTag,
@@ -88,6 +89,7 @@ ReactDOMRoot.prototype.unmount = ReactDOMBlockingRoot.prototype.unmount = functi
   });
 };
 
+// #app 0 undefined
 function createRootImpl(
   container: DOMContainer,
   tag: RootTag,
@@ -133,10 +135,12 @@ export function createBlockingRoot(
   return new ReactDOMBlockingRoot(container, BlockingRoot, options);
 }
 
+// #app undefined
 export function createLegacyRoot(
   container: DOMContainer,
   options?: RootOptions,
 ): RootType {
+  // #app 0 undefined
   return new ReactDOMBlockingRoot(container, LegacyRoot, options);
 }
 

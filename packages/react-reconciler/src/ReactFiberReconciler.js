@@ -214,7 +214,8 @@ function findHostInstanceWithWarning(
   return findHostInstance(component);
 }
 
-export function createContainer(
+// #app 0 undefined undefined
+export function createContainer( // 创建fiberRoot
   containerInfo: Container,
   tag: RootTag,
   hydrate: boolean,

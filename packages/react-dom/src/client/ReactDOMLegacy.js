@@ -122,6 +122,7 @@ function shouldHydrateDueToLegacyHeuristic(container) {
   );
 }
 
+// #app false
 function legacyCreateRootFromDOMContainer(
   container: DOMContainer,
   forceHydrate: boolean,
@@ -163,6 +164,7 @@ function legacyCreateRootFromDOMContainer(
     }
   }
 
+  // #app undefined
   return createLegacyRoot( // 创建fiberRoot
     container,
     shouldHydrate ?
@@ -192,6 +194,7 @@ function legacyRenderSubtreeIntoContainer(
   let fiberRoot;
   if (!root) {
     // Initial mount
+    // #app false
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
       forceHydrate,
@@ -200,7 +203,7 @@ function legacyRenderSubtreeIntoContainer(
     if (typeof callback === 'function') {
       const originalCallback = callback;
       callback = function () {
-        const instance = getPublicRootInstance(fiberRoot);
+        const instance = getPublicRootInstance(fiberRoot); // get inst
         originalCallback.call(instance);
       };
     }
