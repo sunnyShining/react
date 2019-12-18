@@ -57,7 +57,7 @@ function ReactDOMBlockingRoot(
   tag: RootTag,
   options: void | RootOptions,
 ) {
-  this._internalRoot = createRootImpl(container, tag, options);
+  this._internalRoot = createRootImpl(container, tag, options); // fiberRoot
 }
 
 ReactDOMRoot.prototype.render = ReactDOMBlockingRoot.prototype.render = function(

@@ -7,6 +7,7 @@
  * @flow
  */
 
+ // 共同拥有的变量用于通信
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 
 const {ReactCurrentBatchConfig} = ReactSharedInternals;

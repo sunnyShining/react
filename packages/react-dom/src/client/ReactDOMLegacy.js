@@ -199,7 +199,7 @@ function legacyRenderSubtreeIntoContainer(
       container,
       forceHydrate,
     );
-    fiberRoot = root._internalRoot;
+    fiberRoot = root._internalRoot; // fiberRoot
     if (typeof callback === 'function') {
       const originalCallback = callback;
       callback = function () {
@@ -209,6 +209,7 @@ function legacyRenderSubtreeIntoContainer(
     }
     // Initial mount should not be batched.
     unbatchedUpdates(() => {
+      // <App /> fiberRoot null cb
       updateContainer(children, fiberRoot, parentComponent, callback);
     });
   } else {

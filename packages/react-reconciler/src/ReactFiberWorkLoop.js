@@ -292,7 +292,7 @@ let currentEventTime: ExpirationTime = NoWork;
 export function requestCurrentTimeForUpdate() {
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
     // We're inside React, so it's fine to read the actual time.
-    return msToExpirationTime(now());
+    return msToExpirationTime(now()); // 当前时间减去应用开始挂载时间
   }
   // We're not inside React, so we may be in the middle of a browser event.
   if (currentEventTime !== NoWork) {
@@ -1186,6 +1186,7 @@ export function discreteUpdates<A, B, C, R>(
   }
 }
 
+// unbatchedUpdates
 export function unbatchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
   const prevExecutionContext = executionContext;
   executionContext &= ~BatchedContext;

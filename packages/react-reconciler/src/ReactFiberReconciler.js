@@ -224,6 +224,7 @@ export function createContainer( // 创建fiberRoot
   return createFiberRoot(containerInfo, tag, hydrate, hydrationCallbacks);
 }
 
+// <App /> fiberRoot null cb
 export function updateContainer(
   element: ReactNodeList,
   container: OpaqueRoot,
@@ -233,8 +234,9 @@ export function updateContainer(
   if (__DEV__) {
     onScheduleRoot(container, element);
   }
+  // rootFiber
   const current = container.current;
-  const currentTime = requestCurrentTimeForUpdate();
+  const currentTime = requestCurrentTimeForUpdate(); // 数值越大任务优先级越高，和之前的react版本相反
   if (__DEV__) {
     // $FlowExpectedError - jest isn't a global, and isn't recognized outside of tests
     if ('undefined' !== typeof jest) {
@@ -249,7 +251,7 @@ export function updateContainer(
     suspenseConfig,
   );
 
-  const context = getContextForSubtree(parentComponent);
+  const context = getContextForSubtree(parentComponent); // 空对象
   if (container.context === null) {
     container.context = context;
   } else {
