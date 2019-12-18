@@ -134,20 +134,20 @@ export type Fiber = {|
   // minimize the number of objects created during the initial render.
 
   // Tag identifying the type of fiber.
-  tag: WorkTag,
+  tag: WorkTag, // fiber标签
 
   // Unique identifier of this child.
-  key: null | string,
+  key: null | string, // 此子元素的唯一标识符。
 
   // The value of element.type which is used to preserve the identity during
   // reconciliation of this child.
-  elementType: any,
+  elementType: any, // 元素的值。类型，用于在 reconciliation保存此子进程的标识。
 
   // The resolved function/class/ associated with this fiber.
-  type: any,
+  type: any, // type
 
   // The local state associated with this fiber.
-  stateNode: any,
+  stateNode: any, // inst
 
   // Conceptual aliases
   // parent : Instance -> return The parent happens to be the same as the
@@ -159,26 +159,26 @@ export type Fiber = {|
   // This is effectively the parent, but there can be multiple parents (two)
   // so this is only the parent of the thing we're currently processing.
   // It is conceptually the same as the return address of a stack frame.
-  return: Fiber | null,
+  return: Fiber | null, // parent
 
   // Singly Linked List Tree Structure.
-  child: Fiber | null,
-  sibling: Fiber | null,
-  index: number,
+  child: Fiber | null, // firstchild
+  sibling: Fiber | null, // 兄弟节点
+  index: number, // index
 
   // The ref last used to attach this node.
   // I'll avoid adding an owner field for prod and model that as functions.
-  ref: null | (((handle: mixed) => void) & {_stringRef: ?string}) | RefObject,
+  ref: null | (((handle: mixed) => void) & {_stringRef: ?string}) | RefObject, // 保存ref
 
   // Input is the data coming into process this fiber. Arguments. Props.
-  pendingProps: any, // This type will be more specific once we overload the tag.
-  memoizedProps: any, // The props used to create the output.
+  pendingProps: any, // This type will be more specific once we overload the tag. // nextprops
+  memoizedProps: any, // The props used to create the output. // prevprops
 
   // A queue of state updates and callbacks.
-  updateQueue: UpdateQueue<any> | null,
+  updateQueue: UpdateQueue<any> | null, // 更新队列
 
   // The state used to create the output
-  memoizedState: any,
+  memoizedState: any, // this.state
 
   // Dependencies (contexts, events) for this fiber, if it has any
   dependencies: Dependencies | null,
@@ -189,10 +189,10 @@ export type Fiber = {|
   // parent. Additional flags can be set at creation time, but after that the
   // value should remain unchanged throughout the fiber's lifetime, particularly
   // before its child fibers are created.
-  mode: TypeOfMode,
+  mode: TypeOfMode, // 模式
 
   // Effect
-  effectTag: SideEffectTag,
+  effectTag: SideEffectTag, // effect用于最后提交
 
   // Singly linked list fast path to the next fiber with side-effects.
   nextEffect: Fiber | null,
@@ -213,7 +213,7 @@ export type Fiber = {|
   // This is a pooled version of a Fiber. Every fiber that gets updated will
   // eventually have a pair. There are cases when we can clean up pairs to save
   // memory if we need to.
-  alternate: Fiber | null,
+  alternate: Fiber | null, // current => workinprogress
 
   // Time spent rendering this Fiber and its descendants for the current update.
   // This tells us how well the tree makes use of sCU for memoization.
@@ -569,7 +569,7 @@ export function resetWorkInProgress(
 
   return workInProgress;
 }
-
+// 0
 export function createHostRootFiber(tag: RootTag): Fiber {
   let mode;
   if (tag === ConcurrentRoot) {
