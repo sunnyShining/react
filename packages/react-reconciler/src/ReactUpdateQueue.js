@@ -224,10 +224,10 @@ function appendUpdateToQueue<State>(
   update: Update<State>,
 ) {
   // Append the update to the end of the list.
-  if (queue.lastUpdate === null) {
+  if (queue.lastUpdate === null) { // 当前链表是空的
     // Queue is empty
     queue.firstUpdate = queue.lastUpdate = update;
-  } else {
+  } else { // 单向链表加元素
     queue.lastUpdate.next = update;
     queue.lastUpdate = update;
   }
@@ -243,7 +243,7 @@ export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
     queue1 = fiber.updateQueue;
     queue2 = null;
     if (queue1 === null) {
-      queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
+      queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState); // this.state
     }
   } else {
     // There are two owners.
@@ -264,7 +264,7 @@ export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
       if (queue2 === null) {
         // Only one fiber has an update queue. Clone to create a new one.
         queue2 = alternate.updateQueue = cloneUpdateQueue(queue1);
-      } else {
+      } else { // current和alternate都有一个更新队列
         // Both owners have an update queue.
       }
     }
@@ -283,7 +283,7 @@ export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
     } else {
       // Both queues are non-empty. The last update is the same in both lists,
       // because of structural sharing. So, only append to one of the lists.
-      appendUpdateToQueue(queue1, update);
+      appendUpdateToQueue(queue1, update); // 两个链表拥有共同的内存地址，所以不需要设置更新链表2
       // But we still need to update the `lastUpdate` pointer of queue2.
       queue2.lastUpdate = update;
     }

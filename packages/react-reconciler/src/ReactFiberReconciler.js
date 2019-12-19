@@ -279,7 +279,7 @@ export function updateContainer(
   const update = createUpdate(expirationTime, suspenseConfig);
   // Caution: React DevTools currently depends on this property
   // being called "element".
-  update.payload = {element};
+  update.payload = {element}; // <App />
 
   callback = callback === undefined ? null : callback;
   if (callback !== null) {
@@ -294,6 +294,7 @@ export function updateContainer(
     update.callback = callback;
   }
 
+  // 往fiber上添加更新队列
   enqueueUpdate(current, update);
   scheduleWork(current, expirationTime);
 

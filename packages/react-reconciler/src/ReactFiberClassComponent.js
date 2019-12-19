@@ -89,7 +89,7 @@ if (__DEV__) {
     if (callback === null || typeof callback === 'function') {
       return;
     }
-    const key = `${callerName}_${(callback: any)}`;
+    const key = `${callerName}_${(callback)}`;
     if (!didWarnOnInvalidCallback.has(key)) {
       didWarnOnInvalidCallback.add(key);
       warningWithoutStack(
@@ -177,6 +177,7 @@ export function applyDerivedStateFromProps(
   }
 }
 
+// 真正的class component更新逻辑
 const classComponentUpdater = {
   isMounted,
   enqueueSetState(inst, payload, callback) {
@@ -199,7 +200,7 @@ const classComponentUpdater = {
     }
 
     enqueueUpdate(fiber, update);
-    scheduleWork(fiber, expirationTime);
+    scheduleWork(fiber, expirationTime); // 调用更新逻辑
   },
   enqueueReplaceState(inst, payload, callback) {
     const fiber = getInstance(inst);
