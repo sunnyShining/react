@@ -103,11 +103,11 @@ const React = {
   isValidElement: isValidElement,
 
   version: ReactVersion,
-
+  // 这个变量不允许react外部使用
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ReactSharedInternals,
 };
 
-if (exposeConcurrentModeAPIs) {
+if (exposeConcurrentModeAPIs) { // 允许实验室api 在react 17将会稳定
   React.useTransition = useTransition;
   React.useDeferredValue = useDeferredValue;
   React.SuspenseList = REACT_SUSPENSE_LIST_TYPE;

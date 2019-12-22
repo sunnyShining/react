@@ -330,7 +330,7 @@ export function computeExpirationForFiber(
   }
 
   let expirationTime;
-  if (suspenseConfig !== null) {
+  if (suspenseConfig !== null) { // 外部未设置的时候为null
     // Compute an expiration time based on the Suspense timeout.
     expirationTime = computeSuspenseExpiration(
       currentTime,
@@ -340,19 +340,19 @@ export function computeExpirationForFiber(
     // Compute an expiration time based on the Scheduler priority.
     switch (priorityLevel) {
       case ImmediatePriority:
-        expirationTime = Sync;
+        expirationTime = Sync; // 同步任务
         break;
       case UserBlockingPriority:
         // TODO: Rename this to computeUserBlockingExpiration
-        expirationTime = computeInteractiveExpiration(currentTime);
+        expirationTime = computeInteractiveExpiration(currentTime); // 高优先级的，要立马做出反应
         break;
       case NormalPriority:
       case LowPriority: // TODO: Handle LowPriority
         // TODO: Rename this to... something better.
-        expirationTime = computeAsyncExpiration(currentTime);
+        expirationTime = computeAsyncExpiration(currentTime); // 低优先级的
         break;
       case IdlePriority:
-        expirationTime = Idle;
+        expirationTime = Idle; // 最低优先级的
         break;
       default:
         invariant(false, 'Expected a valid priority level');
@@ -376,29 +376,32 @@ export function scheduleUpdateOnFiber(
   fiber: Fiber,
   expirationTime: ExpirationTime,
 ) {
-  checkForNestedUpdates();
-  warnAboutInvalidUpdatesOnClassComponentsInDEV(fiber);
-
-  const root = markUpdateTimeFromFiberToRoot(fiber, expirationTime);
-  if (root === null) {
+  // 判断是否是无限循环update
+  checkForNestedUpdates(); // 检查一次更新是否大于50，抛出错误
+  warnAboutInvalidUpdatesOnClassComponentsInDEV(fiber); // 检查是否调用this.setState错了地方
+  // 找到rootFiber并遍历更新子节点的expirationTime
+  const root = markUpdateTimeFromFiberToRoot(fiber, expirationTime); // 找到当前的rootFiber
+  if (root === null) { // 如果rootFiber为空
     warnAboutUpdateOnUnmountedFiberInDEV(fiber);
     return;
   }
-
+  // 判断是否有高优先级任务打断当前正在执行的任务
   checkForInterruption(fiber, expirationTime);
+  // 报告调度更新，测试环境用的，可不看
   recordScheduleUpdate();
 
   // TODO: computeExpirationForFiber also reads the priority. Pass the
   // priority as an argument to that function and this one.
   const priorityLevel = getCurrentPriorityLevel();
 
-  if (expirationTime === Sync) {
+  if (expirationTime === Sync) { // 最大值，优先级最高，同步任务
     if (
-      // Check if we're inside unbatchedUpdates
-      (executionContext & LegacyUnbatchedContext) !== NoContext &&
+      // 检查一下我们是否在非batchedupdates里
+      (executionContext & LegacyUnbatchedContext) !== NoContext && // BatchedContext & LegacyUnbatchedContext === NoContext
       // Check if we're not already rendering
-      (executionContext & (RenderContext | CommitContext)) === NoContext
+      (executionContext & (RenderContext | CommitContext)) === NoContext // 检查我们是不是正在渲染
     ) {
+      // 在根上注册挂起的交互，以避免丢失跟踪的交互数据。
       // Register pending interactions on the root to avoid losing traced interaction data.
       schedulePendingInteractions(root, expirationTime);
 
@@ -409,7 +412,7 @@ export function scheduleUpdateOnFiber(
     } else {
       ensureRootIsScheduled(root);
       schedulePendingInteractions(root, expirationTime);
-      if (executionContext === NoContext) {
+      if (executionContext === NoContext) { // 此处阻断了setState同步更新
         // Flush the synchronous work now, unless we're already working or inside
         // a batch. This is intentionally inside scheduleUpdateOnFiber instead of
         // scheduleCallbackForFiber to preserve the ability to schedule a callback
@@ -450,23 +453,23 @@ export const scheduleWork = scheduleUpdateOnFiber;
 // on a fiber.
 function markUpdateTimeFromFiberToRoot(fiber, expirationTime) {
   // Update the source fiber's expiration time
-  if (fiber.expirationTime < expirationTime) {
+  if (fiber.expirationTime < expirationTime) { // 更新expirationTime
     fiber.expirationTime = expirationTime;
   }
   let alternate = fiber.alternate;
-  if (alternate !== null && alternate.expirationTime < expirationTime) {
+  if (alternate !== null && alternate.expirationTime < expirationTime) { // 更新alternate
     alternate.expirationTime = expirationTime;
   }
   // Walk the parent path to the root and update the child expiration time.
-  let node = fiber.return;
+  let node = fiber.return; // return is parent
   let root = null;
   if (node === null && fiber.tag === HostRoot) {
     root = fiber.stateNode;
   } else {
-    while (node !== null) {
+    while (node !== null) { // 目的是为了找到fiberRoot
       alternate = node.alternate;
       if (node.childExpirationTime < expirationTime) {
-        node.childExpirationTime = expirationTime;
+        node.childExpirationTime = expirationTime; // 换成任务更高的优先级
         if (
           alternate !== null &&
           alternate.childExpirationTime < expirationTime
@@ -479,7 +482,7 @@ function markUpdateTimeFromFiberToRoot(fiber, expirationTime) {
       ) {
         alternate.childExpirationTime = expirationTime;
       }
-      if (node.return === null && node.tag === HostRoot) {
+      if (node.return === null && node.tag === HostRoot) { // rootFiber
         root = node.stateNode;
         break;
       }
@@ -491,7 +494,7 @@ function markUpdateTimeFromFiberToRoot(fiber, expirationTime) {
     if (workInProgressRoot === root) {
       // Received an update to a tree that's in the middle of rendering. Mark
       // that's unprocessed work on this root.
-      markUnprocessedUpdateTime(expirationTime);
+      markUnprocessedUpdateTime(expirationTime); // 接收到正在呈现的树的更新。标记这是根目录上未处理的工作。
 
       if (workInProgressRootExitStatus === RootSuspendedWithDelay) {
         // The root already suspended with a delay, which means this render
@@ -1188,9 +1191,9 @@ export function discreteUpdates<A, B, C, R>(
 
 // unbatchedUpdates
 export function unbatchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
-  const prevExecutionContext = executionContext;
-  executionContext &= ~BatchedContext;
-  executionContext |= LegacyUnbatchedContext;
+  const prevExecutionContext = executionContext; // 缓存之前的executionContext
+  executionContext &= ~BatchedContext; // 去掉BatchedContext
+  executionContext |= LegacyUnbatchedContext; // 加上LegacyUnbatchedContext
   try {
     return fn(a);
   } finally {
@@ -2558,12 +2561,13 @@ function stopInterruptedWorkLoopTimer() {
   interruptedBy = null;
 }
 
+// 检查被打断
 function checkForInterruption(
   fiberThatReceivedUpdate: Fiber,
   updateExpirationTime: ExpirationTime,
 ) {
   if (
-    enableUserTimingAPI &&
+    enableUserTimingAPI && // __DEV__
     workInProgressRoot !== null &&
     updateExpirationTime > renderExpirationTime
   ) {
@@ -2572,7 +2576,7 @@ function checkForInterruption(
 }
 
 let didWarnStateUpdateForUnmountedComponent: Set<string> | null = null;
-function warnAboutUpdateOnUnmountedFiberInDEV(fiber) {
+function warnAboutUpdateOnUnmountedFiberInDEV(fiber) {// 组件还未挂载呢
   if (__DEV__) {
     const tag = fiber.tag;
     if (
@@ -2686,7 +2690,7 @@ function warnAboutInvalidUpdatesOnClassComponentsInDEV(fiber) {
     if (fiber.tag === ClassComponent) {
       switch (ReactCurrentDebugFiberPhaseInDEV) {
         case 'getChildContext':
-          if (didWarnAboutUpdateInGetChildContext) {
+          if (didWarnAboutUpdateInGetChildContext) { // 在getChildContext调用this.setState
             return;
           }
           warningWithoutStack(
@@ -2696,7 +2700,7 @@ function warnAboutInvalidUpdatesOnClassComponentsInDEV(fiber) {
           didWarnAboutUpdateInGetChildContext = true;
           break;
         case 'render':
-          if (didWarnAboutUpdateInRender) {
+          if (didWarnAboutUpdateInRender) { // 在render里调用
             return;
           }
           warningWithoutStack(
@@ -3010,7 +3014,7 @@ function schedulePendingInteractions(root, expirationTime) {
   // This is called when work is scheduled on a root.
   // It associates the current interactions with the newly-scheduled expiration.
   // They will be restored when that expiration is later committed.
-  if (!enableSchedulerTracing) {
+  if (!enableSchedulerTracing) { // dev
     return;
   }
 

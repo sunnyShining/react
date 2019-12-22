@@ -180,10 +180,11 @@ export function applyDerivedStateFromProps(
 // 真正的class component更新逻辑
 const classComponentUpdater = {
   isMounted,
+  //   this.updater.enqueueSetState(this, partialState, callback, 'setState');
   enqueueSetState(inst, payload, callback) {
-    const fiber = getInstance(inst);
-    const currentTime = requestCurrentTimeForUpdate();
-    const suspenseConfig = requestCurrentSuspenseConfig();
+    const fiber = getInstance(inst); // get current fiber
+    const currentTime = requestCurrentTimeForUpdate(); //获取当前更新时间
+    const suspenseConfig = requestCurrentSuspenseConfig(); // null
     const expirationTime = computeExpirationForFiber(
       currentTime,
       fiber,
@@ -199,7 +200,7 @@ const classComponentUpdater = {
       update.callback = callback;
     }
 
-    enqueueUpdate(fiber, update);
+    enqueueUpdate(fiber, update); // 将更新插入链表
     scheduleWork(fiber, expirationTime); // 调用更新逻辑
   },
   enqueueReplaceState(inst, payload, callback) {

@@ -22,6 +22,7 @@ const ReactSharedInternals = {
   assign,
 };
 
+// in dev
 if (__DEV__) {
   Object.assign(ReactSharedInternals, {
     // These should not be included in production.
