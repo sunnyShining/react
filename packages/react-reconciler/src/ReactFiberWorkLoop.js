@@ -380,13 +380,12 @@ export function scheduleUpdateOnFiber(
   checkForNestedUpdates(); // 检查一次更新是否大于50，抛出错误
   warnAboutInvalidUpdatesOnClassComponentsInDEV(fiber); // 检查是否调用this.setState错了地方
   // 找到rootFiber并遍历更新子节点的expirationTime
-  const root = markUpdateTimeFromFiberToRoot(fiber, expirationTime); // 找到当前的rootFiber
-  if (root === null) { // 如果rootFiber为空
-    warnAboutUpdateOnUnmountedFiberInDEV(fiber);
+  const root = markUpdateTimeFromFiberToRoot(fiber, expirationTime); // 找到当前的FiberRoot
+  if (root === null) { // 如果FiberRoot为空
+    warnAboutUpdateOnUnmountedFiberInDEV(fiber); // 出错了
     return;
   }
-  // 判断是否有高优先级任务打断当前正在执行的任务
-  checkForInterruption(fiber, expirationTime);
+  checkForInterruption(fiber, expirationTime); // 记录任务是否优先级更高，打断正在进行的任务
   // 报告调度更新，测试环境用的，可不看
   recordScheduleUpdate();
 
@@ -410,7 +409,7 @@ export function scheduleUpdateOnFiber(
       // should be deferred until the end of the batch.
       performSyncWorkOnRoot(root);
     } else {
-      ensureRootIsScheduled(root);
+      ensureRootIsScheduled(root); // 确定fiberRoot是否已经被调度
       schedulePendingInteractions(root, expirationTime);
       if (executionContext === NoContext) { // 此处阻断了setState同步更新
         // Flush the synchronous work now, unless we're already working or inside
@@ -464,7 +463,7 @@ function markUpdateTimeFromFiberToRoot(fiber, expirationTime) {
   let node = fiber.return; // return is parent
   let root = null;
   if (node === null && fiber.tag === HostRoot) {
-    root = fiber.stateNode;
+    root = fiber.stateNode; // rootFiber的stateNode就是fiberRoot
   } else {
     while (node !== null) { // 目的是为了找到fiberRoot
       alternate = node.alternate;
@@ -520,6 +519,7 @@ function markUpdateTimeFromFiberToRoot(fiber, expirationTime) {
   return root;
 }
 
+// 获取FiberRoot下一次更新时间
 function getNextRootExpirationTimeToWorkOn(root: FiberRoot): ExpirationTime {
   // Determines the next expiration time that the root should render, taking
   // into account levels that may be suspended, or levels that may have
@@ -563,7 +563,7 @@ function getNextRootExpirationTimeToWorkOn(root: FiberRoot): ExpirationTime {
 // expiration time of the existing task is the same as the expiration time of
 // the next level that the root has work on. This function is called on every
 // update, and right before exiting a task.
-function ensureRootIsScheduled(root: FiberRoot) {
+function ensureRootIsScheduled(root: FiberRoot) { // 确定fiberroot是否已经被调度
   const lastExpiredTime = root.lastExpiredTime;
   if (lastExpiredTime !== NoWork) {
     // Special case: Expired work should flush synchronously.
@@ -597,14 +597,14 @@ function ensureRootIsScheduled(root: FiberRoot) {
 
   // If there's an existing render task, confirm it has the correct priority and
   // expiration time. Otherwise, we'll cancel it and schedule a new one.
-  if (existingCallbackNode !== null) {
+  if (existingCallbackNode !== null) { //如果当前已经存在回调的任务
     const existingCallbackPriority = root.callbackPriority;
     const existingCallbackExpirationTime = root.callbackExpirationTime;
     if (
       // Callback must have the exact same expiration time.
       existingCallbackExpirationTime === expirationTime &&
       // Callback must have greater or equal priority.
-      existingCallbackPriority >= priorityLevel
+      existingCallbackPriority >= priorityLevel // 已存在的任务优先级更高
     ) {
       // Existing callback is sufficient.
       return;
@@ -612,14 +612,14 @@ function ensureRootIsScheduled(root: FiberRoot) {
     // Need to schedule a new task.
     // TODO: Instead of scheduling a new task, we should be able to change the
     // priority of the existing one.
-    cancelCallback(existingCallbackNode);
+    cancelCallback(existingCallbackNode); // 取消回调，等待下一次更新
   }
 
   root.callbackExpirationTime = expirationTime;
   root.callbackPriority = priorityLevel;
 
   let callbackNode;
-  if (expirationTime === Sync) {
+  if (expirationTime === Sync) { // 同步任务
     // Sync React callbacks are scheduled on a special internal queue
     callbackNode = scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root));
   } else if (disableSchedulerTimeoutBasedOnReactExpirationTime) {
@@ -633,7 +633,7 @@ function ensureRootIsScheduled(root: FiberRoot) {
       performConcurrentWorkOnRoot.bind(null, root),
       // Compute a task timeout based on the expiration time. This also affects
       // ordering because tasks are processed in timeout order.
-      {timeout: expirationTimeToMs(expirationTime) - now()},
+      {timeout: expirationTimeToMs(expirationTime) - now()}, // timeout?
     );
   }
 
@@ -2512,7 +2512,7 @@ function computeMsUntilSuspenseLoadingDelay(
 }
 
 function checkForNestedUpdates() {
-  if (nestedUpdateCount > NESTED_UPDATE_LIMIT) {
+  if (nestedUpdateCount > NESTED_UPDATE_LIMIT) { // 最大更新为50已经溢出
     nestedUpdateCount = 0;
     rootWithNestedUpdates = null;
     invariant(
@@ -2569,7 +2569,7 @@ function checkForInterruption(
   if (
     enableUserTimingAPI && // __DEV__
     workInProgressRoot !== null &&
-    updateExpirationTime > renderExpirationTime
+    updateExpirationTime > renderExpirationTime // 当前任务优先级更高
   ) {
     interruptedBy = fiberThatReceivedUpdate;
   }
@@ -2685,6 +2685,7 @@ if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
 
 let didWarnAboutUpdateInRender = false;
 let didWarnAboutUpdateInGetChildContext = false;
+// 检查是不是在render或者getChildContext内部调用了setState
 function warnAboutInvalidUpdatesOnClassComponentsInDEV(fiber) {
   if (__DEV__) {
     if (fiber.tag === ClassComponent) {

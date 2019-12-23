@@ -89,7 +89,7 @@ export function getCurrentPriorityLevel(): ReactPriorityLevel {
       return ImmediatePriority;
     case Scheduler_UserBlockingPriority:
       return UserBlockingPriority;
-    case Scheduler_NormalPriority:
+    case Scheduler_NormalPriority: // init is NormalPriority
       return NormalPriority;
     case Scheduler_LowPriority:
       return LowPriority;

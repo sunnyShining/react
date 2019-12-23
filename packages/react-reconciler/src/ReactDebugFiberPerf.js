@@ -224,12 +224,12 @@ export function recordEffect(): void {
 }
 
 export function recordScheduleUpdate(): void {
-  if (enableUserTimingAPI) {
+  if (enableUserTimingAPI) { // __DEV__
     if (isCommitting) {
       hasScheduledUpdateInCurrentCommit = true;
     }
     if (
-      currentPhase !== null &&
+      currentPhase !== null && // 当前走到哪个生命周期了
       currentPhase !== 'componentWillMount' &&
       currentPhase !== 'componentWillReceiveProps'
     ) {

@@ -102,6 +102,6 @@ export function setCurrentFiber(fiber: Fiber) {
 
 export function setCurrentPhase(lifeCyclePhase: LifeCyclePhase | null) {
   if (__DEV__) {
-    phase = lifeCyclePhase;
+    phase = lifeCyclePhase; // 设置当前所处的生命周期，仅在dev内有效
   }
 }
