@@ -379,7 +379,7 @@ export function scheduleUpdateOnFiber(
   // 判断是否是无限循环update
   checkForNestedUpdates(); // 检查一次更新是否大于50，抛出错误
   warnAboutInvalidUpdatesOnClassComponentsInDEV(fiber); // 检查是否调用this.setState错了地方
-  // 找到rootFiber并遍历更新子节点的expirationTime
+  // 找到FiberRoot并遍历更新子节点的expirationTime
   const root = markUpdateTimeFromFiberToRoot(fiber, expirationTime); // 找到当前的FiberRoot
   if (root === null) { // 如果FiberRoot为空
     warnAboutUpdateOnUnmountedFiberInDEV(fiber); // 出错了
@@ -400,9 +400,9 @@ export function scheduleUpdateOnFiber(
       // Check if we're not already rendering
       (executionContext & (RenderContext | CommitContext)) === NoContext // 检查我们是不是正在渲染
     ) {
-      // 在根上注册挂起的交互，以避免丢失跟踪的交互数据。
       // Register pending interactions on the root to avoid losing traced interaction data.
-      schedulePendingInteractions(root, expirationTime);
+      // 跟踪这些update，并计数、检测它们是否会报错 -- dev
+      schedulePendingInteractions(root, expirationTime); // dev
 
       // This is a legacy edge case. The initial mount of a ReactDOM.render-ed
       // root inside of batchedUpdates should be synchronous, but layout updates
@@ -993,7 +993,7 @@ function performSyncWorkOnRoot(root) {
   const lastExpiredTime = root.lastExpiredTime;
   const expirationTime = lastExpiredTime !== NoWork ? lastExpiredTime : Sync;
   invariant(
-    (executionContext & (RenderContext | CommitContext)) === NoContext,
+    (executionContext & (RenderContext | CommitContext)) === NoContext, // 不应该在工作
     'Should not already be working.',
   );
 
