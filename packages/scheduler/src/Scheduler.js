@@ -278,22 +278,22 @@ function unstable_wrapCallback(callback) {
 
 function timeoutForPriorityLevel(priorityLevel) {
   switch (priorityLevel) {
-    case ImmediatePriority:
+    case ImmediatePriority: // 立即执行
       return IMMEDIATE_PRIORITY_TIMEOUT;
     case UserBlockingPriority:
-      return USER_BLOCKING_PRIORITY;
-    case IdlePriority:
+      return USER_BLOCKING_PRIORITY; // 用户
+    case IdlePriority: // 空闲优先级
       return IDLE_PRIORITY;
-    case LowPriority:
+    case LowPriority: // 低优先级
       return LOW_PRIORITY_TIMEOUT;
-    case NormalPriority:
+    case NormalPriority: // 普通优先级
     default:
       return NORMAL_PRIORITY_TIMEOUT;
   }
 }
 
 function unstable_scheduleCallback(priorityLevel, callback, options) {
-  var currentTime = getCurrentTime();
+  var currentTime = getCurrentTime(); // 获取当前页面加载的相对时间
 
   var startTime;
   var timeout;
@@ -309,25 +309,25 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
         ? options.timeout
         : timeoutForPriorityLevel(priorityLevel);
   } else {
-    timeout = timeoutForPriorityLevel(priorityLevel);
-    startTime = currentTime;
+    timeout = timeoutForPriorityLevel(priorityLevel); // 获取过期时间值
+    startTime = currentTime; // 开始时间为当前相对时间
   }
 
-  var expirationTime = startTime + timeout;
+  var expirationTime = startTime + timeout; // 过期时间为开始时间加过期时间
 
   var newTask = {
-    id: taskIdCounter++,
-    callback,
-    priorityLevel,
-    startTime,
-    expirationTime,
+    id: taskIdCounter++, // 任务id
+    callback, // 回调
+    priorityLevel, // 任务优先级
+    startTime, // 开始时间
+    expirationTime, // 过期时间
     sortIndex: -1,
   };
-  if (enableProfiling) {
+  if (enableProfiling) { // 调试
     newTask.isQueued = false;
   }
 
-  if (startTime > currentTime) {
+  if (startTime > currentTime) { // 这是一个延迟任务早就应该执行了
     // This is a delayed task.
     newTask.sortIndex = startTime;
     push(timerQueue, newTask);

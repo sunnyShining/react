@@ -60,15 +60,18 @@ function ReactDOMBlockingRoot(
   this._internalRoot = createRootImpl(container, tag, options); // fiberRoot
 }
 
+// 真正的渲染reactElements
 ReactDOMRoot.prototype.render = ReactDOMBlockingRoot.prototype.render = function(
   children: ReactNodeList,
   callback: ?() => mixed,
 ): void {
-  const root = this._internalRoot;
+  const root = this._internalRoot; // fiberRoot
+  // 渲染结束后回调
   const cb = callback === undefined ? null : callback;
   if (__DEV__) {
     warnOnInvalidCallback(cb, 'render');
   }
+  // 更新容器
   updateContainer(children, root, null, cb);
 };
 
@@ -92,15 +95,16 @@ ReactDOMRoot.prototype.unmount = ReactDOMBlockingRoot.prototype.unmount = functi
 // #app 0 undefined
 function createRootImpl(
   container: DOMContainer,
-  tag: RootTag,
+  tag: RootTag, // ConcurrentRoot
   options: void | RootOptions,
 ) {
   // Tag is either LegacyRoot or Concurrent Root
   const hydrate = options != null && options.hydrate === true;
   const hydrationCallbacks =
     (options != null && options.hydrationOptions) || null;
-  const root = createContainer(container, tag, hydrate, hydrationCallbacks);
-  markContainerAsRoot(root.current, container);
+  // createFiberRoot
+  const root = createContainer(container, tag, hydrate, hydrationCallbacks); // fiberroot
+  markContainerAsRoot(root.current, container); // 标记这个div容器给这个fiberroot用了，其他人就别用了
   if (hydrate && tag !== LegacyRoot) {
     const doc =
       container.nodeType === DOCUMENT_NODE
@@ -111,12 +115,13 @@ function createRootImpl(
   return root;
 }
 
-export function createRoot(
+// 新的reactDom入口api
+export function createRoot( // create  Fiberroot
   container: DOMContainer,
-  options?: RootOptions,
+  options?: RootOptions, // hydrate参数配置
 ): RootType {
   invariant(
-    isValidContainer(container),
+    isValidContainer(container), // 校验是否是合法的dom
     'createRoot(...): Target container is not a DOM element.',
   );
   warnIfReactDOMContainerInDEV(container);
@@ -174,7 +179,7 @@ function warnIfReactDOMContainerInDEV(container) {
   if (__DEV__) {
     if (isContainerMarkedAsRoot(container)) {
       if (container._reactRootContainer) {
-        warningWithoutStack(
+        warningWithoutStack( // 之前你使用过这个容器
           false,
           'You are calling ReactDOM.createRoot() on a container that was previously ' +
             'passed to ReactDOM.render(). This is not supported.',

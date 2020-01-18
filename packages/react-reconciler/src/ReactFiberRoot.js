@@ -102,6 +102,7 @@ export type FiberRoot = {
 };
 
 // #app 0 false
+// 创建一个对象方式
 function FiberRootNode(containerInfo, tag, hydrate) {
   this.tag = tag; // worktag
   this.current = null; // current
@@ -147,8 +148,8 @@ export function createFiberRoot(
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
-  const uninitializedFiber = createHostRootFiber(tag);
-  root.current = uninitializedFiber;
+  const uninitializedFiber = createHostRootFiber(tag); // 这个是fiber里面加入rootfiber
+  root.current = uninitializedFiber; // rootfiber
   uninitializedFiber.stateNode = root;
 
   return root;

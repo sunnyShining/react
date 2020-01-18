@@ -409,6 +409,7 @@ export function scheduleUpdateOnFiber(
       // should be deferred until the end of the batch.
       performSyncWorkOnRoot(root);
     } else {
+      // 保证fiberRoot已调度
       ensureRootIsScheduled(root); // 确定fiberRoot是否已经被调度
       schedulePendingInteractions(root, expirationTime);
       if (executionContext === NoContext) { // 此处阻断了setState同步更新

@@ -15,9 +15,7 @@ import invariant from 'shared/invariant';
 
 import {getParentSuspenseInstance} from './ReactDOMHostConfig';
 
-const randomKey = Math.random()
-  .toString(36)
-  .slice(2);
+const randomKey = Math.random().toString(36).slice(2); // 随机的key
 const internalInstanceKey = '__reactInternalInstance$' + randomKey;
 const internalEventHandlersKey = '__reactEventHandlers$' + randomKey;
 const internalContainerInstanceKey = '__reactContainere$' + randomKey;
@@ -26,6 +24,7 @@ export function precacheFiberNode(hostInst, node) {
   node[internalInstanceKey] = hostInst;
 }
 
+// 标记这个已经被使用
 export function markContainerAsRoot(hostRoot, node) {
   node[internalContainerInstanceKey] = hostRoot;
 }
@@ -34,7 +33,7 @@ export function unmarkContainerAsRoot(node) {
   node[internalContainerInstanceKey] = null;
 }
 
-export function isContainerMarkedAsRoot(node) {
+export function isContainerMarkedAsRoot(node) { // mark as fiberroot
   return !!node[internalContainerInstanceKey];
 }
 

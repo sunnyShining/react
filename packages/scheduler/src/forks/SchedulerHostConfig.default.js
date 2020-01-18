@@ -100,9 +100,9 @@ if (
     typeof performance === 'object' &&
     typeof performance.now === 'function'
   ) {
-    getCurrentTime = () => performance.now();
+    getCurrentTime = () => performance.now(); // 返回的是相对页面加载的时间
   } else {
-    const initialTime = Date.now();
+    const initialTime = Date.now(); // init time
     getCurrentTime = () => Date.now() - initialTime;
   }
 
