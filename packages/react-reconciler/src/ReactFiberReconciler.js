@@ -232,10 +232,11 @@ export function updateContainer(
   callback: ?Function,
 ): ExpirationTime {
   if (__DEV__) {
-    onScheduleRoot(container, element);
+    onScheduleRoot(container, element); // fiberroot <App />
   }
   // rootFiber
   const current = container.current;
+  //计算当前更新应用的时间
   const currentTime = requestCurrentTimeForUpdate(); // 数值越大任务优先级越高，和之前的react版本相反
   if (__DEV__) {
     // $FlowExpectedError - jest isn't a global, and isn't recognized outside of tests

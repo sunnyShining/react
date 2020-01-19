@@ -103,7 +103,7 @@ if (
     getCurrentTime = () => performance.now(); // 返回的是相对页面加载的时间
   } else {
     const initialTime = Date.now(); // init time
-    getCurrentTime = () => Date.now() - initialTime;
+    getCurrentTime = () => Date.now() - initialTime; // 模拟performance.now()
   }
 
   let isMessageLoopRunning = false;

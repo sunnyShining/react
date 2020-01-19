@@ -290,9 +290,11 @@ let spawnedWorkDuringRender: null | Array<ExpirationTime> = null;
 let currentEventTime: ExpirationTime = NoWork;
 
 export function requestCurrentTimeForUpdate() {
+  // 判断当前的executionContext是否在RenderContext或者CommitContext
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
     // We're inside React, so it's fine to read the actual time.
-    return msToExpirationTime(now()); // 当前时间减去应用开始挂载时间
+    return msToExpirationTime(now()); // 当前时间减去应用开始挂载时间(毫秒)
+    // performance.now
   }
   // We're not inside React, so we may be in the middle of a browser event.
   if (currentEventTime !== NoWork) {

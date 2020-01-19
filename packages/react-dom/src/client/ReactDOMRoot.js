@@ -52,6 +52,7 @@ function ReactDOMRoot(container: DOMContainer, options: void | RootOptions) {
 }
 
 // #app 0 undefined
+// 过渡时期可调用这个api
 function ReactDOMBlockingRoot(
   container: DOMContainer,
   tag: RootTag,
@@ -69,7 +70,7 @@ ReactDOMRoot.prototype.render = ReactDOMBlockingRoot.prototype.render = function
   // 渲染结束后回调
   const cb = callback === undefined ? null : callback;
   if (__DEV__) {
-    warnOnInvalidCallback(cb, 'render');
+    warnOnInvalidCallback(cb, 'render'); // 校验render回调不合法
   }
   // 更新容器
   updateContainer(children, root, null, cb);

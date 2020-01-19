@@ -204,6 +204,7 @@ const foundDevTools = injectIntoDevTools({
   rendererPackageName: 'react-dom',
 });
 
+// dev tools警告
 if (__DEV__) {
   if (!foundDevTools && canUseDOM && window.top === window.self) {
     // If we're in Chrome or Firefox, provide a download link if not installed.
